@@ -15,10 +15,10 @@ class Res2Conv(nn.Module):
             )
 
     def forward(self, x):
-        feas = x[:,:self.invi_feattures,:,:]
+        feas = x[:,:self.invi_features,:,:]
         fea = 0
         for i, conv in enumerate(self.convs):
-            fea += x[:,self.invi_feattures*(i+1):self.invi_feattures*(i+2),:,:]
+            fea += x[:,self.invi_features*(i+1):self.invi_features*(i+2),:,:]
             fea = conv(fea)
             feas = torch.cat([feas, fea], dim=1)
         return feas
