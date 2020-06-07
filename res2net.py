@@ -3,7 +3,7 @@ from torch import nn
 
 
 class Res2Conv(nn.Module):
-    def __init__(self, features, stride=1, scale_num=1, cardinality=1):
+    def __init__(self, features, stride=1, scale_num=4, cardinality=1):
         super(Res2Conv, self).__init__()
         assert scale_num >= 2 # it will be standard conv when scale_num=1
         assert features % scale_num == 0
@@ -23,6 +23,18 @@ class Res2Conv(nn.Module):
             feas = torch.cat([feas, fea], dim=1)
         return feas
 
+
+class Res2NetModule(nn.Module):
+    def __init__(self, features):
+        self.in_conv = nn.Conv2d(features, features, 1)
+        self.res2conv = Res2Conv(features, scale_num=4)
+        self.out_conv = nn.Conv2d(features, features, 1)
+
+    def forward(self, x):
+        fea = self.in_conv(x)
+        fea = self.res2conv(fea)
+        fea = self.out_conv(fea)
+        return fea + x
 
 if __name__=="__main__":
     res2conv = Res2Conv(64, 1, scale_num=4, cardinality=1)
